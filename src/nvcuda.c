@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
+#include <stdarg.h>
+
 #define __WINESRC__
 
 #include "winternl.h"
@@ -23,7 +25,8 @@
 #include "wine/unixlib.h"
 #include "wine/debug.h"
 
-#include "cuda_private.h"
+#include "cuda.h"
+#include "unixlib.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(nvcuda);
 
@@ -34,13 +37,46 @@ WINE_DEFAULT_DEBUG_CHANNEL(nvcuda);
 #include <stdlib.h>
 #include <strings.h>
 #include "libloaderapi.h"
+#endif
 
 CUresult CUDAAPI cuInit(unsigned int Flags)
 {
-    CUresult ret;
+    struct cuInit_params params = { Flags, 0 };
+
     TRACE("(%d)\n", Flags);
 
-    return NVCUDA_CALL(cuInit, &ret)
+    return NVCUDA_CALL(cuInit, &params)
         ? CUDA_ERROR_UNKNOWN
-        : ret;
+        : params.ret;
+}
+
+BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
+{
+    NTSTATUS status;
+
+    TRACE("(%p, %lu, %p)\n", instance, (unsigned long)reason, reserved);
+
+    switch (reason)
+    {
+        case DLL_PROCESS_ATTACH:
+            DisableThreadLibraryCalls(instance);
+            if ((status = __wine_init_unix_call()))
+            {
+                ERR("__wine_init_unix_call failed, status %lx\n", (unsigned long)status);
+                return FALSE;
+            }
+            if ((status = NVCUDA_CALL(attach, NULL)))
+            {
+                ERR("WINE_UNIX_CALL(attach) failed, status %lx\n", (unsigned long)status);
+                return FALSE;
+            }
+            break;
+        case DLL_PROCESS_DETACH:
+            if (reserved)
+                break;
+            NVCUDA_CALL(detach, NULL);
+            break;
+    }
+
+    return TRUE;
 }

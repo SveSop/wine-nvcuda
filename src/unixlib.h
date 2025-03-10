@@ -16,9 +16,20 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#ifndef __WINE_CUDA_PRIVATE_H
-#define __WINE_CUDA_PRIVATE_H
+#ifndef __WINE_NVCUDA_UNIXLIB_H
+#define __WINE_NVCUDA_UNIXLIB_H
 
-#include "cuda.h"
+struct cuInit_params
+{
+    unsigned int Flags;
+    CUresult ret;
+};
+
+enum nvcuda_funcs
+{
+    unix_attach,
+    unix_detach,
+    unix_cuInit,
+};
 
 #endif

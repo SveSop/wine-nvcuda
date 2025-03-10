@@ -12,7 +12,8 @@
 #include "ntstatus.h"
 #include "wine/unixlib.h"
 
-#include "cuda_private.h"
+#include "cuda.h"
+#include "unixlib.h"
 
 static void *libcuda_handle = NULL;
 
@@ -20,9 +21,9 @@ static CUresult CUDAAPI (*pcuInit)(unsigned int Flags) = NULL;
 
 static NTSTATUS wine_cuInit(void *args)
 {
-    CUresult *ret = args;
-    *ret = (pcuInit
-        ? pcuInit(Flags)
+    struct cuInit_params *params = args;
+    params->ret = (pcuInit
+        ? pcuInit(params->Flags)
         : CUDA_ERROR_NOT_FOUND);
     return CUDA_SUCCESS;
 }
@@ -52,4 +53,3 @@ const unixlib_entry_t __wine_unix_call_funcs[] =
     detach,
     wine_cuInit,
 };
-
