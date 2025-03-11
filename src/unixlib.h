@@ -22,10 +22,26 @@
 extern NTSTATUS attach(void *args);
 extern NTSTATUS detach(void *args);
 extern NTSTATUS wine_cuInit(void *args);
+extern NTSTATUS wine_cuCtxCreate(void *args);
+extern NTSTATUS wine_cuCtxDestroy(void *args);
 
 struct cuInit_params
 {
     unsigned int Flags;
+    CUresult ret;
+};
+
+struct cuCtxCreate_params
+{
+    CUcontext *pctx;
+    unsigned int flags;
+    CUdevice dev;
+    CUresult ret;
+};
+
+struct cuCtxDestroy_params
+{
+    CUcontext ctx;
     CUresult ret;
 };
 
@@ -34,6 +50,8 @@ enum nvcuda_funcs
     unix_attach,
     unix_detach,
     unix_cuInit,
+    unix_cuCtxCreate,
+    unix_cuCtxDestroy,
 };
 
 #endif

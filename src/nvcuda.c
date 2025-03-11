@@ -48,6 +48,26 @@ CUresult CUDAAPI cuInit(unsigned int Flags)
     return NVCUDA_CALL(cuInit, &params);
 }
 
+#undef cuCtxCreate // Due to cuCtxCreate_v2 usage
+CUresult CUDAAPI cuCtxCreate(CUcontext *pctx, unsigned int flags, CUdevice dev)
+{
+    struct cuCtxCreate_params params = { pctx, flags, dev, CUDA_SUCCESS };
+
+    TRACE("(%p, %u, %u)\n", pctx, flags, dev);
+
+    return NVCUDA_CALL(cuCtxCreate, &params);
+}
+
+#undef cuCtxDestroy // Due to cuCtxDestroy_v2 usage
+CUresult CUDAAPI cuCtxDestroy(CUcontext ctx)
+{
+    struct cuCtxDestroy_params params = { ctx, CUDA_SUCCESS };
+
+    TRACE("(%p)\n", ctx);
+
+    return NVCUDA_CALL(cuCtxDestroy, &params);
+}
+
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
 {
     NTSTATUS status;
