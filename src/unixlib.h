@@ -19,6 +19,10 @@
 #ifndef __WINE_NVCUDA_UNIXLIB_H
 #define __WINE_NVCUDA_UNIXLIB_H
 
+extern NTSTATUS attach(void *args);
+extern NTSTATUS detach(void *args);
+extern NTSTATUS wine_cuInit(void *args);
+
 struct cuInit_params
 {
     unsigned int Flags;

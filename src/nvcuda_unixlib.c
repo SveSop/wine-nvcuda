@@ -15,11 +15,11 @@
 #include "cuda.h"
 #include "unixlib.h"
 
-static void *libcuda_handle = NULL;
+void *libcuda_handle = NULL;
 
 static CUresult CUDAAPI (*pcuInit)(unsigned int Flags) = NULL;
 
-static NTSTATUS wine_cuInit(void *args)
+__attribute__((visibility("hidden"))) NTSTATUS wine_cuInit(void *args)
 {
     struct cuInit_params *params = args;
     params->ret = (pcuInit
@@ -28,7 +28,7 @@ static NTSTATUS wine_cuInit(void *args)
     return CUDA_SUCCESS;
 }
 
-static NTSTATUS attach(void *args)
+NTSTATUS attach(void *args)
 {
     if (!(libcuda_handle = dlopen("libcuda.so.1", RTLD_NOW))) return STATUS_DLL_NOT_FOUND;
 
@@ -41,7 +41,7 @@ static NTSTATUS attach(void *args)
     return STATUS_SUCCESS;
 }
 
-static NTSTATUS detach(void *args)
+NTSTATUS detach(void *args)
 {
     dlclose(libcuda_handle);
     return STATUS_SUCCESS;
