@@ -19,13 +19,13 @@ void *libcuda_handle = NULL;
 
 static CUresult CUDAAPI (*pcuInit)(unsigned int Flags) = NULL;
 
-__attribute__((visibility("hidden"))) NTSTATUS wine_cuInit(void *args)
+NTSTATUS wine_cuInit(void *args)
 {
     struct cuInit_params *params = args;
     params->ret = (pcuInit
         ? pcuInit(params->Flags)
         : CUDA_ERROR_NOT_FOUND);
-    return CUDA_SUCCESS;
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS attach(void *args)

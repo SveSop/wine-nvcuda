@@ -41,13 +41,11 @@ WINE_DEFAULT_DEBUG_CHANNEL(nvcuda);
 
 CUresult CUDAAPI cuInit(unsigned int Flags)
 {
-    struct cuInit_params params = { Flags, 0 };
+    struct cuInit_params params = { Flags, CUDA_SUCCESS };
 
     TRACE("(%d)\n", Flags);
 
-    return NVCUDA_CALL(cuInit, &params)
-        ? CUDA_ERROR_UNKNOWN
-        : params.ret;
+    return NVCUDA_CALL(cuInit, &params);
 }
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)

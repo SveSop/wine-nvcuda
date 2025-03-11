@@ -26,13 +26,14 @@ static NTSTATUS wow64_cuInit(void *args)
     } *params32 = args;
     struct cuInit_params params =
     {
-        .Flags = params32->Flags
+        params32->Flags,
+        params32->ret
     };
 
     params.ret = wine_cuInit(&params);
     params32->ret = params.ret;
 
-    return CUDA_SUCCESS;
+    return STATUS_SUCCESS;
 }
 
 const unixlib_entry_t __wine_unix_call_wow64_funcs[] =
