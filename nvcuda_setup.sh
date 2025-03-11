@@ -36,6 +36,12 @@ function install {
     cp -f "$nvcuda_dir/$slib/$arch-unix/$1" "$WINE_BIN/$lib/$arch-unix/"
 }
 
+end(){
+    echo -ne "All done - NVCUDA copied to $WINE_BIN\n"
+    echo -ne "You need to run wineboot -u with a wineprefix to use nvcuda!\n"
+    exit 0
+}
+
 echo -ne "Copying 64-bit files..."
 win_install nvcuda.dll
 install nvcuda.so
@@ -46,11 +52,14 @@ arch='i386'
 lib="lib/wine"
 if ! [[ -d "$WINE_BIN/$lib/$arch-windows" ]]; then
     echo -ne "Cant find 32-bit libraries! Exiting\n"
-    exit 1
+    end
 fi
 win_install nvcuda.dll
-install nvcuda.so
+if [ -f "$WINE_BIN/$lib/$arch-unix/ntdll.so" ]; then
+    install nvcuda.so
+else
+    echo -ne " Wow64 wine binaries detected!\n"
+    echo -ne "Skipping 32-bit unixlib..."
+fi
 echo -ne " OK\n"
-
-echo -ne "All done - NVCUDA copied to $WINE_BIN\n"
-echo -ne "You need to run wineboot -u with a wineprefix to use nvcuda!\n"
+end
