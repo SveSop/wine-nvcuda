@@ -45,27 +45,44 @@ CUresult CUDAAPI cuInit(unsigned int Flags)
 
     TRACE("(%d)\n", Flags);
 
-    return NVCUDA_CALL(cuInit, &params);
+    return NVCUDA_CALL(cuInit, &params)
+        ? CUDA_ERROR_UNKNOWN
+        : params.ret;
 }
 
-#undef cuCtxCreate // Due to cuCtxCreate_v2 usage
+CUresult CUDAAPI cuDeviceGet(CUdevice *device, int ordinal)
+{
+    struct cuDeviceGet_params params = { device, ordinal, CUDA_SUCCESS };
+
+    TRACE("(%p, %d)\n", device, ordinal);
+
+    return NVCUDA_CALL(cuDeviceGet, &params)
+        ? CUDA_ERROR_UNKNOWN
+        : params.ret;
+}
+
+#undef cuCtxCreate // Avoid using cuCtxCreate_v2 by default
 CUresult CUDAAPI cuCtxCreate(CUcontext *pctx, unsigned int flags, CUdevice dev)
 {
     struct cuCtxCreate_params params = { pctx, flags, dev, CUDA_SUCCESS };
 
     TRACE("(%p, %u, %u)\n", pctx, flags, dev);
 
-    return NVCUDA_CALL(cuCtxCreate, &params);
+    return NVCUDA_CALL(cuCtxCreate, &params)
+        ? CUDA_ERROR_UNKNOWN
+        : params.ret;
 }
 
-#undef cuCtxDestroy // Due to cuCtxDestroy_v2 usage
+#undef cuCtxDestroy // Avoid using cuCtxDestroy_v2 by default
 CUresult CUDAAPI cuCtxDestroy(CUcontext ctx)
 {
     struct cuCtxDestroy_params params = { ctx, CUDA_SUCCESS };
 
     TRACE("(%p)\n", ctx);
 
-    return NVCUDA_CALL(cuCtxDestroy, &params);
+    return NVCUDA_CALL(cuCtxDestroy, &params)
+        ? CUDA_ERROR_UNKNOWN
+        : params.ret;
 }
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
